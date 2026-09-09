@@ -1,84 +1,72 @@
-Absolutely — here is the complete content formatted as a clean README.md file.
-
-Writing
 Transfer Learning for Plant Disease Classification
 1. Problem Statement
 
-Implement image classification using deep learning models and compare their performance.
+Implement transfer learning using pre-trained deep learning models for image classification and compare their performance.
 
-The assignment focuses on using CNN-based models for classifying plant leaf images into different disease categories. The models used are:
+The models considered in this assignment are:
 
 AlexNet
 VGG16
 ResNet50
 EfficientNetB0
 
-The models are trained and evaluated using the PlantVillage dataset.
+The models are used for classifying plant diseases using the PlantVillage dataset.
 
 2. Objective
 
 The main objectives of this assignment are:
 
-To understand transfer learning for image classification.
-To use pre-trained CNN models for plant disease classification.
-To prepare and preprocess image data.
-To train multiple deep learning models.
-To evaluate models using accuracy, loss, confusion matrix, and classification report.
-To compare the performance of different CNN architectures.
-To identify the best-performing model.
-3. Project Overview
-
-This project performs multi-class plant disease classification using the PlantVillage dataset.
-
-The general workflow is:
-
-PlantVillage Dataset
+Understand transfer learning for image classification.
+Use CNN architectures for plant disease classification.
+Load and preprocess image data.
+Train and evaluate multiple deep learning models.
+Analyze model performance using accuracy and loss.
+Generate confusion matrices and classification reports.
+Compare the performance of different CNN architectures.
+Identify the best-performing model.
+3. Assignment Agenda
+Load PlantVillage Dataset
         ↓
 Image Preprocessing
         ↓
 Training / Validation Split
         ↓
-Model Selection
+Build CNN Models
         ↓
-Transfer Learning
+Apply Transfer Learning
         ↓
-Model Training
+Train Models
         ↓
-Model Evaluation
+Evaluate Models
         ↓
 Confusion Matrix
         ↓
 Classification Report
         ↓
-Performance Comparison
-
-
-Four CNN architectures are evaluated under the same general experimental setup.
-
-VGG16, ResNet50, and EfficientNetB0 use ImageNet pre-trained weights. AlexNet is implemented as a CNN architecture and trained from scratch because a standard ImageNet-pretrained AlexNet model is not provided by TensorFlow/Keras.
+Compare Performance
+        ↓
+Conclusion
 
 4. Dataset
 PlantVillage Dataset
 
-PlantVillage is an image dataset containing photographs of plant leaves belonging to different healthy and diseased categories.
+PlantVillage is an image dataset containing healthy and diseased plant leaf images.
 
-In this experiment, the downloaded PlantVillage version contains:
+The dataset used in this assignment contains:
 
-Dataset Information	Value
-Total Images	20,638
-Number of Classes	15
-Training Images	16,516
-Validation Images	4,122
-Training / Validation Split	80% / 20%
+20,638 images
+15 classes
+16,516 training images
+4,122 validation images
+80% training / 20% validation split
 
-The classes include diseases and healthy categories from plants such as:
+The dataset includes plant categories such as:
 
 Pepper
 Potato
 Tomato
-Classes
 
-Examples of classes include:
+Some of the disease classes include:
 
 Pepper__bell___Bacterial_spot
 Pepper__bell___healthy
@@ -95,109 +83,112 @@ Tomato__Tomato_YellowLeaf__Curl_Virus
 Tomato__Tomato_mosaic_virus
 Tomato_Spider_mites_Two_spotted_spider_mite
 Tomato_healthy
-
 5. Dataset Loading
 
-The dataset was accessed directly in the Google Colab environment using KaggleHub.
+The PlantVillage dataset was accessed directly in Google Colab using KaggleHub.
 
 import kagglehub
 
 path = kagglehub.dataset_download("emmarex/plantdisease")
 
 
-The dataset was then located using:
+The required dataset folder was selected using:
 
 data_dir = os.path.join(path, "PlantVillage")
 
 
-This avoids manually downloading and uploading the dataset to Google Drive.
+This allows the dataset to be accessed directly in the Colab runtime without manually uploading it to Google Drive.
 
 6. Image Preprocessing
 
-Images were resized to:
+All images were resized to:
 
 224 × 224 × 3
 
+A batch size of 32 was used.
 
-The same image size was used for the CNN models to maintain a consistent input format.
+The dataset was divided into training and validation sets using an 80:20 split.
 
-The dataset was divided using:
-
-validation_split=0.2
-
-
-This creates:
-
-80% → Training
-20% → Validation
-
-7. ImageDataGenerator
-
-ImageDataGenerator was used to load images from folders and create batches.
+For the initial CNN data generator:
 
 datagen = ImageDataGenerator(
     rescale=1./255,
     validation_split=0.2
 )
 
-Important Parameters
-Parameter	Purpose
-rescale	Normalizes pixel values
-validation_split	Creates the validation portion
-target_size	Resizes images
-batch_size	Controls images processed at once
-class_mode="categorical"	Used for multi-class classification
-shuffle=True	Used for training data
-shuffle=False	Used for validation data
-8. Training Parameters
+Important preprocessing operations
+Resizing: Converts images to a common input size.
+Rescaling: Converts pixel values from 0–255 to 0–1.
+Validation split: Separates part of the dataset for validation.
+Categorical labels: Used because the problem has multiple classes.
+7. ImageDataGenerator
 
-Common parameters used in the experiment:
+ImageDataGenerator is used to load images from folders and prepare batches for training.
 
-IMG_SIZE = (224, 224)
-BATCH_SIZE = 32
-EPOCHS = 5
-LEARNING_RATE = 0.0001
-SEED = 42
+Example:
+
+train_data = datagen.flow_from_directory(
+    data_dir,
+    target_size=(224, 224),
+    batch_size=32,
+    class_mode="categorical",
+    subset="training",
+    shuffle=True,
+    seed=42
+)
 
 
-These settings were kept consistent where applicable to make model comparison easier.
+For validation:
 
-9. Models Used
-9.1 AlexNet
+val_data = datagen.flow_from_directory(
+    data_dir,
+    target_size=(224, 224),
+    batch_size=32,
+    class_mode="categorical",
+    subset="validation",
+    shuffle=False
+)
 
-AlexNet is an early deep convolutional neural network architecture.
 
-It contains:
+shuffle=False is used for validation so that predictions remain aligned with the actual class labels during evaluation.
+
+8. Models Used
+8.1 AlexNet
+
+AlexNet is an early and influential convolutional neural network architecture.
+
+It consists of:
 
 Convolutional layers
 Max-pooling layers
 Fully connected layers
 ReLU activation
 Dropout
-Softmax output layer
+Softmax output
 
-The final layer was changed to:
+A simplified AlexNet architecture was implemented using Keras.
+
+The final classification layer contains 15 neurons:
 
 Dense(NUM_CLASSES, activation="softmax")
 
-
-Since there are 15 classes, the output layer contains 15 neurons.
-
 AlexNet in this Assignment
 
-A standard ImageNet-pretrained AlexNet implementation is not available in TensorFlow/Keras applications. Therefore, AlexNet was implemented using Keras layers and trained from scratch.
+A standard ImageNet-pretrained AlexNet implementation is not provided by TensorFlow/Keras.
 
-9.2 VGG16
+Therefore, AlexNet was implemented as a CNN and trained from scratch.
 
-VGG16 is a deep CNN architecture containing 16 layers.
+8.2 VGG16
+
+VGG16 is a deep convolutional neural network architecture.
 
 It mainly uses:
 
 3×3 convolution filters
-Max pooling
+Max-pooling layers
 Fully connected classification layers
 
-For this assignment, VGG16 was loaded with ImageNet weights:
+VGG16 was loaded with ImageNet pre-trained weights:
 
 VGG16(
     weights="imagenet",
@@ -206,20 +197,23 @@ VGG16(
 )
 
 
-The original classifier was removed and replaced with a classifier for 15 PlantVillage classes.
+The original ImageNet classifier was removed.
 
 The pre-trained layers were frozen:
 
 for layer in vgg_base.layers:
     layer.trainable = False
 
-9.3 ResNet50
 
-ResNet50 is a 50-layer CNN that uses residual connections.
+A new classifier was then added for the 15 PlantVillage classes.
 
-Residual connections help deeper networks learn effectively by allowing information to pass through shortcut connections.
+8.3 ResNet50
 
-ResNet50 was loaded using:
+ResNet50 is a 50-layer CNN architecture.
+
+Its main feature is the use of residual connections, which help deeper networks learn effectively.
+
+ResNet50 was loaded using ImageNet pre-trained weights:
 
 ResNet50(
     weights="imagenet",
@@ -228,15 +222,21 @@ ResNet50(
 )
 
 
-The ImageNet classification layer was removed and a new classifier was added for the 15 PlantVillage classes.
+The original classifier was removed and replaced with a classifier containing 15 output classes.
 
 The pre-trained layers were frozen during training.
 
-9.4 EfficientNetB0
+8.4 EfficientNetB0
 
-EfficientNetB0 is a lightweight CNN architecture designed to provide a good balance between accuracy and computational efficiency.
+EfficientNetB0 is a lightweight and efficient CNN architecture.
 
-It was loaded with ImageNet weights:
+It provides a good balance between:
+
+Accuracy
+Model size
+Computational cost
+
+EfficientNetB0 was loaded with ImageNet pre-trained weights:
 
 EfficientNetB0(
     weights="imagenet",
@@ -245,17 +245,17 @@ EfficientNetB0(
 )
 
 
-The original classifier was replaced with a new classifier containing 15 output classes.
+The original classifier was removed and replaced with a new classifier for the 15 PlantVillage classes.
 
-The pre-trained layers were frozen during the initial training.
+9. Transfer Learning
 
-10. Transfer Learning
+Transfer learning uses knowledge learned by a model on a large dataset and applies it to a new problem.
 
-Transfer learning uses knowledge learned from a large dataset and applies it to another classification problem.
+For VGG16, ResNet50, and EfficientNetB0, ImageNet pre-trained weights were used.
 
-In this project:
+The general process is:
 
-ImageNet Pre-trained Model
+Pre-trained ImageNet Model
           ↓
 Remove Original Classifier
           ↓
@@ -266,15 +266,13 @@ Add New Classifier
 Train on PlantVillage
 
 
-The pre-trained CNN acts as a feature extractor.
+The pre-trained CNN works as a feature extractor while the new classification layers learn to identify PlantVillage disease classes.
 
-The newly added layers learn to classify the PlantVillage disease classes.
+This reduces the amount of training required compared with training a large CNN completely from scratch.
 
-This reduces training requirements compared with training a large CNN completely from scratch.
+10. Classifier Layers
 
-11. Model Classifier
-
-A common classifier structure was used for the pre-trained models:
+For the pre-trained models, the original classifier was replaced with:
 
 x = base_model.output
 x = GlobalAveragePooling2D()(x)
@@ -284,23 +282,23 @@ output = Dense(NUM_CLASSES, activation="softmax")(x)
 
 GlobalAveragePooling2D
 
-Converts the feature maps produced by the CNN into a compact feature vector.
+Converts the feature maps into a compact feature vector.
 
-Dense Layer
+Dense
 
-Learns combinations of extracted features.
+Learns useful combinations of the extracted features.
 
 Dropout
 
-Reduces overfitting by randomly disabling some neurons during training.
+Helps reduce overfitting by randomly disabling neurons during training.
 
 Softmax
 
-Produces probability values for all 15 classes.
+Produces probabilities for all 15 classes.
 
-12. Model Compilation
+11. Model Compilation
 
-The models were compiled using:
+The models were compiled using the Adam optimizer and categorical cross-entropy loss.
 
 model.compile(
     optimizer=Adam(learning_rate=0.0001),
@@ -310,17 +308,17 @@ model.compile(
 
 Adam Optimizer
 
-Adam adjusts model weights during training using adaptive learning rates.
+Adam is an optimization algorithm used to update the model weights during training.
 
 Categorical Cross-Entropy
 
-Used as the loss function because this is a multi-class classification problem.
+Used as the loss function for multi-class classification.
 
 Accuracy
 
 Measures the percentage of correctly classified images.
 
-13. Model Training
+12. Training
 
 The models were trained using:
 
@@ -331,23 +329,30 @@ model.fit(
 )
 
 
-During training, the model learns patterns from the training images.
+The important training parameters were:
 
-Validation data is used to measure how well the model performs on unseen images.
+Parameter	Value
+Image Size	224 × 224
+Batch Size	32
+Epochs	5
+Learning Rate	0.0001
+Number of Classes	15
 
-14. Accuracy and Loss
+During training, the model learns patterns from the training images and validation accuracy is used to monitor performance on unseen images.
 
-Two important metrics were monitored:
+13. Accuracy and Loss
+
+Two important metrics were monitored during training.
 
 Accuracy
 
-Higher accuracy indicates more correct predictions.
+Higher accuracy means more images are classified correctly.
 
 Loss
 
-Lower loss indicates that the predicted probabilities are closer to the correct class.
+Lower loss indicates that the predicted probabilities are closer to the correct classes.
 
-Training and validation accuracy/loss were plotted using Matplotlib.
+Training and validation curves were plotted using Matplotlib.
 
 Example:
 
@@ -355,11 +360,11 @@ plt.plot(history.history["accuracy"])
 plt.plot(history.history["val_accuracy"])
 
 
-These graphs help understand the learning behavior of the model.
+These graphs help visualize the learning behavior of each model.
 
-15. Model Evaluation
+14. Model Evaluation
 
-After training, each model was evaluated on the validation dataset.
+After training, each model was evaluated using the validation dataset.
 
 loss, accuracy = model.evaluate(
     validation_data,
@@ -367,9 +372,9 @@ loss, accuracy = model.evaluate(
 )
 
 
-The final validation accuracy was used for comparing the models.
+The validation accuracy was used as the main metric for comparing the models.
 
-16. Predictions
+15. Predictions
 
 Predictions were generated using:
 
@@ -383,22 +388,20 @@ np.argmax(predictions, axis=1)
 
 argmax() returns the class having the highest predicted probability.
 
-17. Confusion Matrix
+16. Confusion Matrix
 
-A confusion matrix is used to understand the classification performance for each class.
-
-It compares:
+A confusion matrix compares the actual classes with the predicted classes.
 
 Actual Class
-     vs
+     ↓
 Predicted Class
 
 
 The diagonal values represent correctly classified images.
 
-Off-diagonal values represent incorrect classifications.
+The off-diagonal values represent incorrect classifications.
 
-A confusion matrix helps identify which plant diseases are being confused with each other.
+The confusion matrix helps identify which disease classes are being confused with one another.
 
 It was generated using:
 
@@ -410,11 +413,7 @@ cm = confusion_matrix(
 
 The matrix was visualized using a Seaborn heatmap.
 
-Example:
-
-sns.heatmap(cm, annot=True, fmt="d", cmap="Blues")
-
-18. Classification Report
+17. Classification Report
 
 The classification report provides detailed performance for every class.
 
@@ -426,19 +425,19 @@ F1-score
 Support
 Precision
 
-Measures how many predicted samples of a class were actually correct.
+Shows how many predicted samples of a class were actually correct.
 
 Recall
 
-Measures how many actual samples of a class were correctly detected.
+Shows how many actual samples of a class were correctly detected.
 
 F1-score
 
-The harmonic mean of precision and recall.
+Represents the balance between precision and recall.
 
 Support
 
-Number of actual samples belonging to a class.
+Represents the number of actual samples belonging to the class.
 
 The report was generated using:
 
@@ -448,42 +447,24 @@ classification_report(
     target_names=class_names
 )
 
-19. Performance Comparison
+18. Performance Comparison
 
-The final validation accuracy obtained from the models was:
+The final validation accuracies were:
 
-Rank	Model	Validation Accuracy
-1	ResNet50	94.30%
-2	EfficientNetB0	93.26%
-3	AlexNet	88.60%
-4	VGG16	86.00%
-Performance Visualization
-ResNet50       ███████████████████ 94.30%
-EfficientNetB0 ██████████████████  93.26%
-AlexNet        █████████████████   88.60%
-VGG16          ████████████████    86.00%
-
+Model	Validation Accuracy
+ResNet50	94.30%
+EfficientNetB0	93.26%
+AlexNet	88.60%
+VGG16	86.00%
+Ranking
+ResNet50 → 94.30%
+EfficientNetB0 → 93.26%
+AlexNet → 88.60%
+VGG16 → 86.00%
 
 ResNet50 achieved the highest validation accuracy in this experiment.
 
-EfficientNetB0 performed very closely behind ResNet50 while being a more lightweight architecture.
-
-20. Advantages
-Uses deep learning for automatic disease classification.
-Transfer learning reduces training requirements.
-Pre-trained models provide useful image features.
-Multiple CNN architectures can be compared.
-Confusion matrices provide class-level analysis.
-Classification reports provide precision, recall, and F1-score.
-PlantVillage provides a suitable dataset for plant disease classification.
-21. Limitations
-Only 5 epochs were used for training.
-Results depend on the selected dataset version and preprocessing.
-AlexNet was trained from scratch rather than using pre-trained ImageNet weights.
-Some disease classes contain fewer images than others.
-Validation accuracy may not represent performance on real-world field images.
-More training and fine-tuning could potentially improve performance.
-22. Technologies Used
+19. Technologies Used
 Python
 Google Colab
 TensorFlow
@@ -494,69 +475,76 @@ Matplotlib
 Seaborn
 Scikit-learn
 KaggleHub
-23. Libraries and Important Functions
-Function / Class	Purpose
-ImageDataGenerator()	Image preprocessing and data splitting
+20. Important ML/DL Functions Used
+Function	Purpose
+ImageDataGenerator()	Image preprocessing and splitting
 flow_from_directory()	Loads images from class folders
 Conv2D()	Performs convolution
-MaxPooling2D()	Reduces feature map size
+MaxPooling2D()	Reduces feature map dimensions
 Dense()	Fully connected layer
-Dropout()	Reduces overfitting
-GlobalAveragePooling2D()	Converts feature maps into feature vectors
-Model()	Creates the final neural network
-Sequential()	Creates sequential CNN models
-Adam()	Optimization algorithm
-model.fit()	Trains the model
-model.evaluate()	Evaluates the model
+Dropout()	Helps reduce overfitting
+GlobalAveragePooling2D()	Converts feature maps into vectors
+Sequential()	Builds sequential CNN models
+Model()	Builds functional models
+Adam()	Optimizer
+model.fit()	Trains models
+model.evaluate()	Evaluates models
 model.predict()	Generates predictions
 confusion_matrix()	Creates confusion matrix
-classification_report()	Generates classification metrics
-np.argmax()	Finds the predicted class
+classification_report()	Generates evaluation metrics
+np.argmax()	Finds predicted class
 plt.plot()	Plots training curves
 sns.heatmap()	Displays confusion matrix
-24. Algorithm
+21. Algorithm
 Load the PlantVillage dataset.
-Identify the plant disease classes.
+Identify the 15 disease classes.
 Resize images to 224 × 224.
-Split the dataset into training and validation sets.
+Split images into training and validation sets.
 Create the CNN models.
-Load ImageNet weights for VGG16, ResNet50, and EfficientNetB0.
+Load ImageNet weights for VGG16, ResNet50 and EfficientNetB0.
 Freeze the pre-trained layers.
-Replace the original classifier with a 15-class classifier.
+Remove the original classification layer.
+Add a new 15-class classification layer.
 Compile the models using Adam and categorical cross-entropy.
 Train each model for 5 epochs.
-Evaluate each model on validation data.
+Evaluate models on validation data.
 Generate predictions.
 Generate confusion matrices.
 Generate classification reports.
 Compare validation accuracy.
 Identify the best-performing model.
-25. Result
+22. Advantages
+Provides automatic plant disease classification.
+Transfer learning reduces training requirements.
+Pre-trained models provide useful image features.
+Multiple CNN architectures can be compared.
+Confusion matrices provide class-level analysis.
+Classification reports provide detailed performance metrics.
+PlantVillage is suitable for multi-class plant disease classification.
+23. Limitations
+Only 5 epochs were used.
+Results depend on the selected dataset version and preprocessing.
+AlexNet was trained from scratch because a standard ImageNet-pretrained AlexNet model was not available through TensorFlow/Keras.
+Some classes contain fewer images than others.
+Performance on controlled PlantVillage images may differ from real-world field images.
+Further fine-tuning may improve model performance.
+24. Result
 
-The models achieved the following validation accuracy:
+The final validation results were:
 
-Model	Validation Accuracy
-ResNet50	94.30%
-EfficientNetB0	93.26%
-AlexNet	88.60%
-VGG16	86.00%
-Best Performing Model
+ResNet50 → 94.30%
+EfficientNetB0 → 93.26%
+AlexNet → 88.60%
+VGG16 → 86.00%
 
-ResNet50 achieved the best performance with 94.30% validation accuracy.
+ResNet50 achieved the best validation accuracy of 94.30%.
 
-The performance ranking was:
+25. Conclusion
 
-1. ResNet50       → 94.30%
-2. EfficientNetB0 → 93.26%
-3. AlexNet        → 88.60%
-4. VGG16          → 86.00%
+This assignment demonstrated image classification using CNN architectures and transfer learning on the PlantVillage dataset.
 
-26. Conclusion
+VGG16, ResNet50, and EfficientNetB0 used ImageNet pre-trained weights, while AlexNet was implemented and trained from scratch.
 
-This assignment demonstrated the use of CNN architectures for multi-class plant disease classification using the PlantVillage dataset.
+Among all tested models, ResNet50 achieved the highest validation accuracy of 94.30%, followed by EfficientNetB0 with 93.26%.
 
-Transfer learning with pre-trained CNN models provided strong classification performance. Among the evaluated models, ResNet50 performed best, achieving 94.30% validation accuracy, followed by EfficientNetB0 with 93.26%.
-
-The experiment shows that pre-trained deep learning models can effectively extract useful visual features for plant disease classification and can be adapted to new image classification tasks with relatively limited training.
-
-Overall, ResNet50 was the best-performing model in this experiment, while EfficientNetB0 provided a strong alternative with competitive accuracy and a lightweight architecture.
+The experiment shows that pre-trained deep learning models can effectively extract useful image features and achieve strong performance on plant disease classification tasks.
